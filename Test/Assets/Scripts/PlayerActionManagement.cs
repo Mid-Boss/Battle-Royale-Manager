@@ -17,11 +17,16 @@ public class PlayerActionManagement : MonoBehaviour {
     public int bulletSpeed = 2;
     int weapon = 0;
     bool isShooting = false;
+    float shotCounter = 0;
+    public float reloadTime = 0.6f;
+    public float lootTime = 1;
+    float weaponPickupTimer = 0;
+    public float accuracy = 0.7f;
     float randX;
     float randY;
     float width;
     float height;
-    public int detectRange = 15;
+    public int detectRange = 20;
     GameObject detectedEnemy;
     Camera firstCamera;
 
@@ -40,26 +45,35 @@ public class PlayerActionManagement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        detectedEnemy = EngageEnemy();
         if (weapon == 0)
         {
             MoveToLoot();
         }
+        else if (detectedEnemy != null)
+        {
+            ai.destination = transform.position;
+            ai.SearchPath();
+            if (shotCounter >= reloadTime)
+            {
+                if (UnityEngine.Random.Range(0.0f, 1.0f) <= accuracy)
+                {
+                    ShootEm(detectedEnemy);
+                }
+                shotCounter = 0;
+            }
+            shotCounter += Time.deltaTime;
+        }
         else
         {
-            detectedEnemy = EngageEnemy();
-            if (!isShooting && detectedEnemy != null)
-            {
-                isShooting = true;
-                ShootEm(detectedEnemy);
-                print("Shooting");
-            }
-            count += Time.deltaTime;
-            if (count >= timeToAction)
-            {
-                MoveToCircle();
-                count = 0;
-            }
+            MoveToCircle();
         }
+            //count += Time.deltaTime;
+            //if (count >= timeToAction)
+            //{
+                
+            //    count = 0;
+            //}
 	}
 
     void MoveToCircle ()
@@ -97,10 +111,12 @@ public class PlayerActionManagement : MonoBehaviour {
     private void OnTriggerEnter(Collider collision)
     {
         print("Weapon Collision");
-        if (collision.gameObject.tag == "Weapon")
+        if (collision.gameObject.tag == "Weapon")// && weaponPickupTimer >= lootTime)
         {
             weapon = 1;
+            weaponPickupTimer = 0;
         }
+        //weaponPickupTimer += Time.deltaTime;
     }
 
     GameObject EngageEnemy ()
@@ -134,8 +150,9 @@ public class PlayerActionManagement : MonoBehaviour {
 
     void ShootEm (GameObject target)
     {
-        BulletMovement bulletScript = bullet.GetComponent<BulletMovement>();
         GameObject clone = Instantiate(bullet, transform.position, transform.rotation);
+        BulletMovement bulletScript = clone.GetComponent<BulletMovement>();
         bulletScript.target = target.transform;
+        bulletScript.shooterObj = gameObject;
     }
 }

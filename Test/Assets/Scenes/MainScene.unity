@@ -395,8 +395,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0f4f84fc5d1ef9498da9053e31e88ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerCount: 2
-  weaponCount: 2
+  playerCount: 10
+  weaponCount: 10
   gogo: 1
   CD: {fileID: 1895829601791400, guid: 6652d43feadc8b34cae2e8ae63f95750, type: 2}
   player: {fileID: 1797766892328630, guid: 82cdff759c3d6c64db00e6c27ac3a073, type: 2}
